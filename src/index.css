@@ -4,30 +4,30 @@
 
 @layer base {
   :root {
-    /* Brand - earthy pastels */
-    --background: 36 40% 98%;
-    --foreground: 140 15% 18%;
+    /* Brand - earthy pastels with airy glass */
+    --background: 36 50% 97%;
+    --foreground: 140 18% 16%;
 
     --card: 0 0% 100%;
-    --card-foreground: 140 15% 18%;
+    --card-foreground: 140 18% 16%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 140 15% 18%;
+    --popover-foreground: 140 18% 16%;
 
     /* Soft green #7FB77E */
-    --primary: 119 28% 60%;
+    --primary: 119 28% 58%;
     --primary-foreground: 0 0% 100%;
     --primary-soft: 119 35% 92%;
 
     /* Warm beige #F5E6D3 */
     --secondary: 33 65% 90%;
-    --secondary-foreground: 25 30% 25%;
+    --secondary-foreground: 25 30% 22%;
 
     --muted: 33 30% 95%;
-    --muted-foreground: 140 8% 45%;
+    --muted-foreground: 140 8% 42%;
 
     /* Muted orange #F2A65A */
-    --accent: 26 85% 65%;
+    --accent: 22 80% 62%;
     --accent-foreground: 0 0% 100%;
     --accent-soft: 26 80% 94%;
 
@@ -36,21 +36,26 @@
     --destructive: 4 70% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 33 25% 90%;
-    --input: 33 25% 90%;
-    --ring: 119 28% 60%;
+    --border: 33 30% 88%;
+    --input: 33 30% 88%;
+    --ring: 119 28% 58%;
 
-    --radius: 1.25rem;
+    --radius: 1.5rem;
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(119 35% 70%), hsl(119 28% 55%));
-    --gradient-warm: linear-gradient(135deg, hsl(33 65% 92%), hsl(26 80% 88%));
-    --gradient-accent: linear-gradient(135deg, hsl(26 85% 70%), hsl(15 75% 60%));
+    /* Glassy gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(119 38% 72%) 0%, hsl(119 30% 52%) 100%);
+    --gradient-warm: linear-gradient(135deg, hsl(33 75% 92% / 0.9), hsl(22 80% 88% / 0.9));
+    --gradient-accent: linear-gradient(135deg, hsl(22 85% 72%), hsl(12 70% 58%));
+    --gradient-bg: radial-gradient(at 12% 8%, hsl(26 85% 88% / 0.85) 0px, transparent 45%),
+                   radial-gradient(at 95% 14%, hsl(119 50% 84% / 0.75) 0px, transparent 50%),
+                   radial-gradient(at 80% 95%, hsl(33 80% 86% / 0.85) 0px, transparent 45%),
+                   radial-gradient(at 5% 90%, hsl(159 40% 84% / 0.6) 0px, transparent 45%),
+                   linear-gradient(180deg, hsl(36 60% 97%), hsl(33 55% 95%));
 
-    /* Shadows - soft */
-    --shadow-soft: 0 2px 12px -2px hsl(140 15% 18% / 0.06);
-    --shadow-card: 0 4px 20px -6px hsl(140 15% 18% / 0.08);
-    --shadow-glow: 0 8px 30px -8px hsl(119 28% 60% / 0.35);
+    /* Shadows - soft glass */
+    --shadow-soft: 0 1px 2px hsl(140 15% 18% / 0.04), 0 6px 24px -10px hsl(140 15% 18% / 0.08);
+    --shadow-card: 0 1px 2px hsl(140 15% 18% / 0.04), 0 12px 40px -14px hsl(140 15% 18% / 0.12);
+    --shadow-glow: 0 10px 40px -10px hsl(119 30% 50% / 0.45);
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -73,8 +78,9 @@
   }
 
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply text-foreground antialiased;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: hsl(33 55% 95%);
   }
 
   h1, h2, h3, h4 {
@@ -85,17 +91,52 @@
 
 @layer components {
   .app-shell {
-    @apply mx-auto w-full max-w-[440px] min-h-screen bg-background relative;
-    box-shadow: 0 0 60px -20px hsl(140 15% 18% / 0.15);
+    @apply mx-auto w-full max-w-[440px] min-h-screen relative overflow-hidden;
+    background: var(--gradient-bg);
+    box-shadow: 0 0 80px -20px hsl(140 15% 18% / 0.18);
   }
 
+  .app-shell::before,
+  .app-shell::after {
+    content: "";
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(60px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .app-shell::before {
+    width: 280px; height: 280px;
+    top: -80px; right: -80px;
+    background: radial-gradient(circle, hsl(119 60% 75% / 0.55), transparent 70%);
+  }
+  .app-shell::after {
+    width: 320px; height: 320px;
+    bottom: 40px; left: -120px;
+    background: radial-gradient(circle, hsl(22 90% 78% / 0.5), transparent 70%);
+  }
+  .app-shell > * { position: relative; z-index: 1; }
+
   .soft-card {
-    @apply bg-card rounded-3xl p-5;
+    @apply rounded-3xl p-5 border;
+    background: hsl(0 0% 100% / 0.6);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border-color: hsl(0 0% 100% / 0.7);
     box-shadow: var(--shadow-card);
   }
 
+  .glass {
+    background: hsl(0 0% 100% / 0.55);
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid hsl(0 0% 100% / 0.6);
+  }
+
   .chip {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border;
+    border-color: hsl(0 0% 100% / 0.6);
+    backdrop-filter: blur(8px);
   }
 
   .no-scrollbar::-webkit-scrollbar { display: none; }
