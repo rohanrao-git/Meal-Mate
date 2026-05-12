@@ -113,7 +113,7 @@
   /* Sticker-like chips */
   .chip {
     @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wider;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-family: 'Roboto Mono', ui-monospace, monospace;
     border: 1.5px solid hsl(var(--border));
     background: hsl(var(--card));
     color: hsl(var(--foreground));
@@ -121,7 +121,7 @@
   }
 
   .label-mono {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-family: 'Roboto Mono', ui-monospace, monospace;
     @apply uppercase tracking-[0.18em] text-[10px] font-semibold;
   }
 

@@ -9,7 +9,7 @@ const Index = () => {
       <header className="px-5 pt-8 pb-4 flex items-end justify-between border-b-2 border-border">
         <div>
           <p className="label-mono text-muted-foreground">Vol. 04 · Mon May</p>
-          <h1 className="text-[40px] leading-[0.9] font-bold italic mt-1">
+          <h1 className="text-[40px] leading-[0.9] font-black mt-1">
             The<br />Pantry<span className="text-accent">.</span>
           </h1>
         </div>
@@ -40,7 +40,7 @@ const Index = () => {
           <div className="flex items-center gap-2 label-mono opacity-80">
             <Sparkles size={12} /> AI Suggestion · 01
           </div>
-          <h3 className="mt-3 text-3xl font-bold italic leading-[1.05]" style={{ fontFamily: "'Fraunces', serif" }}>
+          <h3 className="mt-3 text-3xl font-black leading-[1.05]" style={{ fontFamily: "'Roboto', sans-serif" }}>
             You can cook<br />
             <span className="text-accent">4 meals</span> right now
           </h3>
@@ -51,14 +51,14 @@ const Index = () => {
             <Link
               to="/meals"
               className="bg-accent text-accent-foreground px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider border-2 border-background flex items-center gap-1.5"
-              style={{ fontFamily: "'JetBrains Mono', monospace" }}
+              style={{ fontFamily: "'Roboto Mono', monospace" }}
             >
               What to cook <ArrowUpRight size={14} />
             </Link>
             <Link
               to="/inventory"
               className="px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider border-2 border-background"
-              style={{ fontFamily: "'JetBrains Mono', monospace" }}
+              style={{ fontFamily: "'Roboto Mono', monospace" }}
             >
               Pantry
             </Link>
@@ -78,7 +78,7 @@ const Index = () => {
             className={`p-4 text-center ${i < 2 ? "border-r-2 border-border" : ""}`}
           >
             <Icon size={16} className="mx-auto text-accent" strokeWidth={2.4} />
-            <p className="mt-1.5 text-2xl font-bold italic" style={{ fontFamily: "'Fraunces', serif" }}>{value}</p>
+            <p className="mt-1.5 text-2xl font-black" style={{ fontFamily: "'Roboto', sans-serif" }}>{value}</p>
             <p className="label-mono text-muted-foreground mt-0.5">{label}</p>
           </div>
         ))}
@@ -89,7 +89,7 @@ const Index = () => {
         <div className="flex items-end justify-between mb-3 border-b-2 border-border pb-2">
           <div>
             <p className="label-mono text-muted-foreground">Tonight</p>
-            <h3 className="text-2xl font-bold italic" style={{ fontFamily: "'Fraunces', serif" }}>The pick</h3>
+            <h3 className="text-2xl font-black" style={{ fontFamily: "'Roboto', sans-serif" }}>The pick</h3>
           </div>
           <Link to="/meals" className="label-mono text-foreground underline underline-offset-4 decoration-2">
             See all →
@@ -100,7 +100,7 @@ const Index = () => {
             🍝
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-base leading-tight" style={{ fontFamily: "'Fraunces', serif" }}>
+            <p className="font-bold text-base leading-tight" style={{ fontFamily: "'Roboto', sans-serif" }}>
               Creamy Garlic Pasta
             </p>
             <p className="text-xs text-muted-foreground mt-1">Uses 6 of your ingredients</p>
@@ -124,7 +124,7 @@ const Index = () => {
             </div>
             <div className="flex-1">
               <p className="label-mono text-accent">Saturday run</p>
-              <p className="text-base font-bold italic" style={{ fontFamily: "'Fraunces', serif" }}>
+              <p className="text-base font-black" style={{ fontFamily: "'Roboto', sans-serif" }}>
                 7 items · est. $24.50
               </p>
             </div>
