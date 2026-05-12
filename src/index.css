@@ -74,16 +74,15 @@
 
   body {
     @apply text-foreground antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Roboto', system-ui, -apple-system, sans-serif;
     background:
       radial-gradient(circle at 1px 1px, hsl(30 25% 14% / 0.06) 1px, transparent 0) 0 0 / 18px 18px,
       hsl(var(--background));
   }
 
   h1, h2, h3, h4 {
-    font-family: 'Fraunces', 'Times New Roman', serif;
-    font-optical-sizing: auto;
-    font-variation-settings: "opsz" 100;
+    font-family: 'Roboto', system-ui, sans-serif;
+    font-weight: 900;
     letter-spacing: -0.02em;
     @apply text-foreground;
   }
@@ -114,7 +113,7 @@
   /* Sticker-like chips */
   .chip {
     @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wider;
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-family: 'Roboto Mono', ui-monospace, monospace;
     border: 1.5px solid hsl(var(--border));
     background: hsl(var(--card));
     color: hsl(var(--foreground));
@@ -122,7 +121,7 @@
   }
 
   .label-mono {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-family: 'Roboto Mono', ui-monospace, monospace;
     @apply uppercase tracking-[0.18em] text-[10px] font-semibold;
   }
 

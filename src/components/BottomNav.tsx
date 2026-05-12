@@ -29,7 +29,7 @@ const BottomNav = () => (
                 idx === items.length - 1 ? "rounded-r-[10px]" : ""
               }`
             }
-            style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}
+            style={{ fontFamily: "'Roboto Mono', ui-monospace, monospace" }}
           >
             <Icon size={18} strokeWidth={2.2} />
             <span>{label}</span>
