@@ -4,67 +4,62 @@
 
 @layer base {
   :root {
-    /* Brand - earthy pastels with airy glass */
-    --background: 36 50% 97%;
-    --foreground: 140 18% 16%;
+    /* Earthy editorial palette — paper, ink, moss, terracotta */
+    --background: 38 45% 94%;
+    --foreground: 30 20% 12%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 140 18% 16%;
+    --card: 38 55% 97%;
+    --card-foreground: 30 20% 12%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 140 18% 16%;
+    --popover: 38 55% 97%;
+    --popover-foreground: 30 20% 12%;
 
-    /* Soft green #7FB77E */
-    --primary: 119 28% 58%;
-    --primary-foreground: 0 0% 100%;
-    --primary-soft: 119 35% 92%;
+    /* Moss green */
+    --primary: 110 24% 38%;
+    --primary-foreground: 38 55% 97%;
+    --primary-soft: 110 30% 86%;
 
-    /* Warm beige #F5E6D3 */
-    --secondary: 33 65% 90%;
-    --secondary-foreground: 25 30% 22%;
+    /* Warm beige paper */
+    --secondary: 35 50% 88%;
+    --secondary-foreground: 30 25% 18%;
 
-    --muted: 33 30% 95%;
-    --muted-foreground: 140 8% 42%;
+    --muted: 35 30% 90%;
+    --muted-foreground: 30 12% 38%;
 
-    /* Muted orange #F2A65A */
-    --accent: 22 80% 62%;
-    --accent-foreground: 0 0% 100%;
-    --accent-soft: 26 80% 94%;
+    /* Terracotta */
+    --accent: 16 65% 50%;
+    --accent-foreground: 38 55% 97%;
+    --accent-soft: 22 70% 88%;
 
-    --success: 119 40% 55%;
-    --warning: 35 90% 60%;
-    --destructive: 4 70% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --success: 110 30% 42%;
+    --warning: 35 80% 50%;
+    --destructive: 4 70% 48%;
+    --destructive-foreground: 38 55% 97%;
 
-    --border: 33 30% 88%;
-    --input: 33 30% 88%;
-    --ring: 119 28% 58%;
+    /* Strong inky borders for brutalist feel */
+    --border: 30 25% 14%;
+    --input: 30 25% 14%;
+    --ring: 16 65% 50%;
 
-    --radius: 1.5rem;
+    --radius: 0.75rem;
 
-    /* Glassy gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(119 38% 72%) 0%, hsl(119 30% 52%) 100%);
-    --gradient-warm: linear-gradient(135deg, hsl(33 75% 92% / 0.9), hsl(22 80% 88% / 0.9));
-    --gradient-accent: linear-gradient(135deg, hsl(22 85% 72%), hsl(12 70% 58%));
-    --gradient-bg: radial-gradient(at 12% 8%, hsl(26 85% 88% / 0.85) 0px, transparent 45%),
-                   radial-gradient(at 95% 14%, hsl(119 50% 84% / 0.75) 0px, transparent 50%),
-                   radial-gradient(at 80% 95%, hsl(33 80% 86% / 0.85) 0px, transparent 45%),
-                   radial-gradient(at 5% 90%, hsl(159 40% 84% / 0.6) 0px, transparent 45%),
-                   linear-gradient(180deg, hsl(36 60% 97%), hsl(33 55% 95%));
+    --gradient-primary: linear-gradient(135deg, hsl(110 28% 45%), hsl(110 22% 30%));
+    --gradient-warm: linear-gradient(135deg, hsl(22 75% 86%), hsl(35 60% 84%));
+    --gradient-accent: linear-gradient(135deg, hsl(22 80% 62%), hsl(16 70% 48%));
 
-    /* Shadows - soft glass */
-    --shadow-soft: 0 1px 2px hsl(140 15% 18% / 0.04), 0 6px 24px -10px hsl(140 15% 18% / 0.08);
-    --shadow-card: 0 1px 2px hsl(140 15% 18% / 0.04), 0 12px 40px -14px hsl(140 15% 18% / 0.12);
-    --shadow-glow: 0 10px 40px -10px hsl(119 30% 50% / 0.45);
+    /* Hard offset shadows */
+    --shadow-soft: 3px 3px 0 0 hsl(30 25% 14%);
+    --shadow-card: 5px 5px 0 0 hsl(30 25% 14%);
+    --shadow-glow: 6px 6px 0 0 hsl(30 25% 14%);
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --sidebar-background: 38 45% 94%;
+    --sidebar-foreground: 30 20% 12%;
+    --sidebar-primary: 30 25% 14%;
+    --sidebar-primary-foreground: 38 55% 97%;
+    --sidebar-accent: 35 50% 88%;
+    --sidebar-accent-foreground: 30 20% 12%;
+    --sidebar-border: 30 25% 14%;
+    --sidebar-ring: 16 65% 50%;
   }
 }
 
@@ -80,63 +75,55 @@
   body {
     @apply text-foreground antialiased;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background: hsl(33 55% 95%);
+    background:
+      radial-gradient(circle at 1px 1px, hsl(30 25% 14% / 0.06) 1px, transparent 0) 0 0 / 18px 18px,
+      hsl(var(--background));
   }
 
   h1, h2, h3, h4 {
-    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
-    @apply tracking-tight;
+    font-family: 'Fraunces', 'Times New Roman', serif;
+    font-optical-sizing: auto;
+    font-variation-settings: "opsz" 100;
+    letter-spacing: -0.02em;
+    @apply text-foreground;
   }
 }
 
 @layer components {
   .app-shell {
-    @apply mx-auto w-full max-w-[440px] min-h-screen relative overflow-hidden;
-    background: var(--gradient-bg);
-    box-shadow: 0 0 80px -20px hsl(140 15% 18% / 0.18);
+    @apply mx-auto w-full max-w-[440px] min-h-screen relative;
+    background: hsl(var(--background));
+    border-left: 2px solid hsl(var(--border));
+    border-right: 2px solid hsl(var(--border));
   }
 
-  .app-shell::before,
-  .app-shell::after {
-    content: "";
-    position: absolute;
-    border-radius: 9999px;
-    filter: blur(60px);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .app-shell::before {
-    width: 280px; height: 280px;
-    top: -80px; right: -80px;
-    background: radial-gradient(circle, hsl(119 60% 75% / 0.55), transparent 70%);
-  }
-  .app-shell::after {
-    width: 320px; height: 320px;
-    bottom: 40px; left: -120px;
-    background: radial-gradient(circle, hsl(22 90% 78% / 0.5), transparent 70%);
-  }
-  .app-shell > * { position: relative; z-index: 1; }
-
+  /* Cards: paper with hard ink border + offset shadow */
   .soft-card {
-    @apply rounded-3xl p-5 border;
-    background: hsl(0 0% 100% / 0.6);
-    backdrop-filter: blur(18px) saturate(140%);
-    -webkit-backdrop-filter: blur(18px) saturate(140%);
-    border-color: hsl(0 0% 100% / 0.7);
+    @apply rounded-xl p-5;
+    background: hsl(var(--card));
+    border: 2px solid hsl(var(--border));
     box-shadow: var(--shadow-card);
   }
 
   .glass {
-    background: hsl(0 0% 100% / 0.55);
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
-    border: 1px solid hsl(0 0% 100% / 0.6);
+    background: hsl(var(--card));
+    border: 2px solid hsl(var(--border));
+    box-shadow: var(--shadow-card);
   }
 
+  /* Sticker-like chips */
   .chip {
-    @apply inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border;
-    border-color: hsl(0 0% 100% / 0.6);
-    backdrop-filter: blur(8px);
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wider;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    border: 1.5px solid hsl(var(--border));
+    background: hsl(var(--card));
+    color: hsl(var(--foreground));
+    box-shadow: 2px 2px 0 0 hsl(var(--border));
+  }
+
+  .label-mono {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    @apply uppercase tracking-[0.18em] text-[10px] font-semibold;
   }
 
   .no-scrollbar::-webkit-scrollbar { display: none; }
