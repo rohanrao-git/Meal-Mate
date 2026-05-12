@@ -74,16 +74,15 @@
 
   body {
     @apply text-foreground antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'Roboto', system-ui, -apple-system, sans-serif;
     background:
       radial-gradient(circle at 1px 1px, hsl(30 25% 14% / 0.06) 1px, transparent 0) 0 0 / 18px 18px,
       hsl(var(--background));
   }
 
   h1, h2, h3, h4 {
-    font-family: 'Fraunces', 'Times New Roman', serif;
-    font-optical-sizing: auto;
-    font-variation-settings: "opsz" 100;
+    font-family: 'Roboto', system-ui, sans-serif;
+    font-weight: 900;
     letter-spacing: -0.02em;
     @apply text-foreground;
   }
