@@ -4,13 +4,15 @@ interface Props {
   title: string;
   subtitle?: string;
   right?: ReactNode;
+  eyebrow?: string;
 }
 
-const ScreenHeader = ({ title, subtitle, right }: Props) => (
-  <header className="px-5 pt-8 pb-4 flex items-start justify-between gap-3">
+const ScreenHeader = ({ title, subtitle, right, eyebrow }: Props) => (
+  <header className="px-5 pt-10 pb-5 flex items-end justify-between gap-3 border-b-2 border-border mb-5">
     <div>
-      <h1 className="text-2xl font-bold text-foreground">{title}</h1>
-      {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
+      {eyebrow && <p className="label-mono text-muted-foreground mb-1.5">{eyebrow}</p>}
+      <h1 className="text-[34px] leading-[0.95] font-bold italic">{title}</h1>
+      {subtitle && <p className="text-sm text-muted-foreground mt-2 max-w-[260px]">{subtitle}</p>}
     </div>
     {right}
   </header>

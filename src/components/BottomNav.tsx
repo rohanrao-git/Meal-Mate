@@ -3,43 +3,36 @@ import { Home, Carrot, ChefHat, ShoppingCart, User } from "lucide-react";
 
 const items = [
   { to: "/", label: "Home", icon: Home },
-  { to: "/inventory", label: "Inventory", icon: Carrot },
+  { to: "/inventory", label: "Pantry", icon: Carrot },
   { to: "/meals", label: "Meals", icon: ChefHat },
-  { to: "/grocery", label: "Grocery", icon: ShoppingCart },
-  { to: "/profile", label: "Profile", icon: User },
+  { to: "/grocery", label: "Shop", icon: ShoppingCart },
+  { to: "/profile", label: "You", icon: User },
 ];
 
 const BottomNav = () => (
-  <nav className="sticky bottom-3 mx-3 z-30 rounded-3xl glass shadow-[var(--shadow-card)]">
-    <ul className="grid grid-cols-5 px-2 py-2">
-      {items.map(({ to, label, icon: Icon }) => (
-        <li key={to}>
+  <nav className="sticky bottom-3 mx-3 z-30 rounded-xl bg-card border-2 border-border shadow-[5px_5px_0_0_hsl(var(--border))]">
+    <ul className="grid grid-cols-5">
+      {items.map(({ to, label, icon: Icon }, idx) => (
+        <li
+          key={to}
+          className={idx < items.length - 1 ? "border-r-2 border-border" : ""}
+        >
           <NavLink
             to={to}
             end={to === "/"}
             className={({ isActive }) =>
-              `flex flex-col items-center gap-1 py-1.5 rounded-2xl text-[11px] font-medium transition-colors ${
-                isActive ? "text-primary-foreground" : "text-muted-foreground"
+              `flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold uppercase tracking-wider transition-colors ${
+                isActive
+                  ? "bg-foreground text-background"
+                  : "text-foreground hover:bg-secondary"
+              } ${idx === 0 ? "rounded-l-[10px]" : ""} ${
+                idx === items.length - 1 ? "rounded-r-[10px]" : ""
               }`
             }
+            style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}
           >
-            {({ isActive }) => (
-              <>
-                <span
-                  className={`flex items-center justify-center w-11 h-8 rounded-full transition-all ${
-                    isActive ? "shadow-[var(--shadow-glow)]" : ""
-                  }`}
-                  style={isActive ? { background: "var(--gradient-primary)" } : undefined}
-                >
-                  <Icon
-                    size={18}
-                    strokeWidth={isActive ? 2.6 : 2}
-                    className={isActive ? "" : "text-foreground/70"}
-                  />
-                </span>
-                <span className={isActive ? "text-foreground" : ""}>{label}</span>
-              </>
-            )}
+            <Icon size={18} strokeWidth={2.2} />
+            <span>{label}</span>
           </NavLink>
         </li>
       ))}
