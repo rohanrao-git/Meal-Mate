@@ -19,7 +19,7 @@ const Profile = () => {
           R
         </div>
         <div className="flex-1">
-          <h1 className="text-xl font-bold">Rohan Patel</h1>
+          <h1 className="text-xl font-bold">Rohan Rao</h1>
           <p className="text-xs text-muted-foreground">Student · Melbourne</p>
         </div>
         <button className="w-10 h-10 rounded-full bg-card grid place-items-center shadow-[var(--shadow-soft)]">
@@ -106,7 +106,7 @@ const Profile = () => {
           </button>
         </div>
 
-        {["Account & privacy", "Help & support", "About Pantry"].map((l) => (
+        {["Account & privacy", "Help & support", "About MealMate"].map((l) => (
           <button key={l} className="w-full soft-card flex items-center justify-between !py-4">
             <span className="text-sm font-medium">{l}</span>
             <ChevronRight size={16} className="text-muted-foreground" />

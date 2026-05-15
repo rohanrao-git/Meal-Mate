@@ -10,7 +10,7 @@ const Index = () => {
         <div>
           <p className="label-mono text-muted-foreground">Vol. 04 · Mon May</p>
           <h1 className="text-[40px] leading-[0.9] font-black mt-1">
-            The<br />Pantry<span className="text-accent">.</span>
+            Meal<br />Mate<span className="text-accent">.</span>
           </h1>
         </div>
         <button className="relative w-11 h-11 rounded-lg bg-card border-2 border-border grid place-items-center shadow-[3px_3px_0_0_hsl(var(--border))] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
