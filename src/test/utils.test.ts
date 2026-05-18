@@ -7,6 +7,7 @@ describe("cn utility", () => {
   });
 
   it("handles conditional values", () => {
-    expect(cn("text-sm", false && "hidden", "font-bold")).toBe("text-sm font-bold");
+    const shouldHide = false;
+    expect(cn("text-sm", shouldHide ? "hidden" : undefined, "font-bold")).toBe("text-sm font-bold");
   });
 });
