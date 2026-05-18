@@ -47,7 +47,10 @@ pipeline {
       steps {
         sh 'npm run lint'
         withSonarQubeEnv('sonarqube-server') {
-          sh 'sonar-scanner -Dproject.settings=sonarqube-project.properties'
+          script {
+            def scannerHome = tool 'SonarScanner'
+            sh "${scannerHome}/bin/sonar-scanner -Dproject.settings=sonarqube-project.properties"
+          }
         }
       }
     }
