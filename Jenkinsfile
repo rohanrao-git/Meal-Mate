@@ -8,16 +8,21 @@ pipeline {
 
   environment {
     APP_NAME = 'meal-mate'
+
     IMAGE_REPO = 'meal-mate'
     IMAGE_TAG = "${env.BUILD_NUMBER}"
-    IMAGE_URI = "${env.IMAGE_REPO}:${env.IMAGE_TAG}"
-    PROD_IMAGE_TAG = 'prod'
-    PROD_PORT = '8081'
-    REPORT_DIR = 'reports'
+    IMAGE_URI = "${IMAGE_REPO}:${IMAGE_TAG}"
+
+    PROD_TAG = 'prod'
+
     STAGING_PORT = '18080'
+    PROD_PORT = '8081'
+
+    REPORT_DIR = 'reports'
   }
 
   stages {
+
     stage('Build') {
       steps {
         sh 'mkdir -p $REPORT_DIR'
@@ -49,6 +54,7 @@ pipeline {
     stage('Code Quality') {
       steps {
         sh 'npm run lint'
+
         withSonarQubeEnv('sonarqube-server') {
           script {
             def scannerHome = tool 'SonarScanner'
@@ -61,8 +67,10 @@ pipeline {
     stage('Security') {
       steps {
         sh 'mkdir -p $REPORT_DIR'
+
         sh 'npm audit --json > $REPORT_DIR/npm-audit.json || true'
         sh 'node scripts/security-audit-report.mjs $REPORT_DIR/npm-audit.json $REPORT_DIR/security-summary.txt'
+
         sh 'trivy fs --scanners vuln,secret --severity HIGH,CRITICAL --exit-code 1 --no-progress .'
         sh 'trivy image --severity HIGH,CRITICAL --exit-code 1 --no-progress $IMAGE_URI'
       }
@@ -73,7 +81,7 @@ pipeline {
       }
     }
 
-    stage('Deploy') {
+    stage('Deploy Staging') {
       steps {
         sh 'docker compose -f ci/docker-compose.staging.yml down --remove-orphans || true'
         sh 'IMAGE_REPO=$IMAGE_REPO IMAGE_TAG=$IMAGE_TAG docker compose -f ci/docker-compose.staging.yml up -d'
@@ -81,43 +89,36 @@ pipeline {
       }
     }
 
-    stage('Release') {
-      when {
-        anyOf {
-          branch 'main'
-          tag '*'
-        }
-      }
+    stage('Release (Production Approval)') {
       steps {
-        input message: 'Promote staging build to production?', ok: 'Release'
-        sh '''
-          docker tag "$IMAGE_URI" "$IMAGE_REPO:$PROD_IMAGE_TAG"
-          IMAGE_REPO="$IMAGE_REPO" IMAGE_TAG="$PROD_IMAGE_TAG" PROD_PORT="$PROD_PORT" \
-            docker compose -f ci/docker-compose.prod.yml down --remove-orphans || true
-          IMAGE_REPO="$IMAGE_REPO" IMAGE_TAG="$PROD_IMAGE_TAG" PROD_PORT="$PROD_PORT" \
-            docker compose -f ci/docker-compose.prod.yml up -d
-          curl -fsS "http://localhost:$PROD_PORT/health"
-        '''
+        script {
+          input message: "Deploy BUILD #${env.BUILD_NUMBER} to PRODUCTION?", ok: "Deploy"
+
+          sh """
+            docker tag ${IMAGE_URI} ${IMAGE_REPO}:${PROD_TAG}
+
+            IMAGE_REPO=${IMAGE_REPO} IMAGE_TAG=${PROD_TAG} PROD_PORT=${PROD_PORT} \
+              docker compose -f ci/docker-compose.prod.yml down --remove-orphans || true
+
+            IMAGE_REPO=${IMAGE_REPO} IMAGE_TAG=${PROD_TAG} PROD_PORT=${PROD_PORT} \
+              docker compose -f ci/docker-compose.prod.yml up -d
+
+            curl -fsS http://localhost:${PROD_PORT}/health
+          """
+        }
       }
     }
 
     stage('Monitoring') {
-      when {
-        anyOf {
-          branch 'main'
-          tag '*'
-        }
-      }
       steps {
         sh '''
-          # New Relic deployment marker. Requires NEW_RELIC_API_KEY and NEW_RELIC_ACCOUNT_ID.
           if [ -n "$NEW_RELIC_API_KEY" ] && [ -n "$NEW_RELIC_ACCOUNT_ID" ]; then
             curl -sS -X POST "https://api.newrelic.com/graphql" \
               -H "Content-Type: application/json" \
               -H "API-Key: $NEW_RELIC_API_KEY" \
-              -d "{\"query\":\"mutation { changeTrackingCreateDeployment(deployment: { version: \\\"$IMAGE_TAG\\\", user: \\\"jenkins\\\", description: \\\"Release $IMAGE_URI deployed to production\\\", entityGuid: \\\"$NEW_RELIC_ENTITY_GUID\\\" }) { deploymentId } }\"}";
+              -d "{\"query\":\"mutation { changeTrackingCreateDeployment(deployment: { version: \\\"$IMAGE_TAG\\\", user: \\\"jenkins\\\", description: \\\"Release $IMAGE_URI deployed to production\\\", entityGuid: \\\"$NEW_RELIC_ENTITY_GUID\\\" }) { deploymentId } }\"}"
           else
-            echo "New Relic credentials not configured; skipping deployment marker."
+            echo "New Relic not configured, skipping."
           fi
         '''
       }
@@ -129,7 +130,7 @@ pipeline {
       cleanWs()
     }
     failure {
-      echo 'Pipeline failed. Check test, quality, and security reports under archived artifacts.'
+      echo "Pipeline failed. Check logs in Jenkins."
     }
   }
 }
