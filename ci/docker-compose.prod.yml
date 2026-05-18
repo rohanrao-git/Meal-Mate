@@ -1,0 +1,7 @@
+services:
+  meal-mate-production:
+    image: ${IMAGE_REPO}:${IMAGE_TAG}
+    container_name: meal-mate-production
+    ports:
+      - "${PROD_PORT:-80}:80"
+    restart: unless-stopped

@@ -24,18 +24,27 @@ This repository includes a complete Jenkins pipeline in `Jenkinsfile` with the f
     - whether/how it is addressed (recommended package update/fix availability).
   - Pipeline fails on high/critical vulnerabilities.
 - Deploy: Docker Compose deploy to staging (`ci/docker-compose.staging.yml`) and health check.
-- Release: Manual promotion gate for `main`/tags, then production release placeholder commands.
+- Release: Manual promotion gate for `main`/tags, then Docker image promotion from staging-tested build to production (`prod` tag) via `ci/docker-compose.prod.yml`.
 - Monitoring: New Relic deployment marker integration for production release notifications.
 
 ### Jenkins prerequisites
 
 - Jenkins agent with Node.js 20+, Docker, Docker Compose, and Trivy installed.
 - SonarQube server configured in Jenkins as `sonarqube-server`.
-- Optional env/credentials for monitoring and registry publishing:
+- Optional env/credentials for monitoring:
   - `NEW_RELIC_API_KEY`
   - `NEW_RELIC_ACCOUNT_ID`
   - `NEW_RELIC_ENTITY_GUID`
-  - registry credentials (`REGISTRY_USER`, `REGISTRY_PASS`, `REGISTRY_URL`) if pushing images.
+
+### Docker-only Promotion Flow
+
+The pipeline demonstrates promotion from staging to production using Docker only:
+
+1. Build stage creates image `meal-mate:<BUILD_NUMBER>`.
+2. Deploy stage runs staging container from that exact image on port `18080`.
+3. Release stage (manual approval) retags the same tested image to `meal-mate:prod`.
+4. Release stage deploys production container using `ci/docker-compose.prod.yml` on port `8081`.
+5. Release stage validates production with `curl http://localhost:8081/health`.
 
 ## Supabase Cloud CRUD
 

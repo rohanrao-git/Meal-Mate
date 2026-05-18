@@ -1,0 +1,19 @@
+version: 0.0
+os: linux
+files:
+  - source: /
+    destination: /opt/meal-mate
+    overwrite: true
+hooks:
+  BeforeInstall:
+    - location: codedeploy/scripts/before_install.sh
+      timeout: 180
+      runas: root
+  ApplicationStart:
+    - location: codedeploy/scripts/start_application.sh
+      timeout: 300
+      runas: root
+  ValidateService:
+    - location: codedeploy/scripts/validate_service.sh
+      timeout: 120
+      runas: root

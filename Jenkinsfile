@@ -11,6 +11,8 @@ pipeline {
     IMAGE_REPO = 'meal-mate'
     IMAGE_TAG = "${env.BUILD_NUMBER}"
     IMAGE_URI = "${env.IMAGE_REPO}:${env.IMAGE_TAG}"
+    PROD_IMAGE_TAG = 'prod'
+    PROD_PORT = '8081'
     REPORT_DIR = 'reports'
     STAGING_PORT = '18080'
   }
@@ -89,15 +91,12 @@ pipeline {
       steps {
         input message: 'Promote staging build to production?', ok: 'Release'
         sh '''
-          docker tag $IMAGE_URI $IMAGE_REPO:latest
-          # Replace with your registry login/push when available.
-          # docker login -u $REGISTRY_USER -p $REGISTRY_PASS $REGISTRY_URL
-          # docker push $IMAGE_URI
-          # docker push $IMAGE_REPO:latest
-        '''
-        sh '''
-          # Replace with production deploy command, e.g. SSH + compose/Kubernetes.
-          echo "Production release placeholder executed for $IMAGE_URI"
+          docker tag "$IMAGE_URI" "$IMAGE_REPO:$PROD_IMAGE_TAG"
+          IMAGE_REPO="$IMAGE_REPO" IMAGE_TAG="$PROD_IMAGE_TAG" PROD_PORT="$PROD_PORT" \
+            docker compose -f ci/docker-compose.prod.yml down --remove-orphans || true
+          IMAGE_REPO="$IMAGE_REPO" IMAGE_TAG="$PROD_IMAGE_TAG" PROD_PORT="$PROD_PORT" \
+            docker compose -f ci/docker-compose.prod.yml up -d
+          curl -fsS "http://localhost:$PROD_PORT/health"
         '''
       }
     }
