@@ -1,0 +1,7 @@
+services:
+  meal-mate-staging:
+    image: ${IMAGE_REPO}:${IMAGE_TAG}
+    container_name: meal-mate-staging
+    ports:
+      - "8080:80"
+    restart: unless-stopped
