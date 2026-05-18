@@ -1,6 +1,11 @@
 pipeline {
   agent any
 
+  parameters {
+    booleanParam(name: 'RUN_PROD_DEPLOY', defaultValue: false, description: 'Run production approval + deployment even for manual dashboard runs.')
+    booleanParam(name: 'RUN_MONITORING', defaultValue: false, description: 'Run monitoring stage even for manual dashboard runs.')
+  }
+
   options {
     timestamps()
     buildDiscarder(logRotator(numToKeepStr: '20'))
@@ -87,10 +92,7 @@ pipeline {
 
     stage('Approve Production Deployment') {
       when {
-        anyOf {
-          branch 'main'
-          tag '*'
-        }
+        expression { params.RUN_PROD_DEPLOY || env.BRANCH_NAME == 'main' || env.TAG_NAME }
       }
       steps {
         timeout(time: 15, unit: 'MINUTES') {
@@ -101,10 +103,7 @@ pipeline {
 
     stage('Deploy to Production') {
       when {
-        anyOf {
-          branch 'main'
-          tag '*'
-        }
+        expression { params.RUN_PROD_DEPLOY || env.BRANCH_NAME == 'main' || env.TAG_NAME }
       }
       steps {
         sh '''
@@ -123,10 +122,7 @@ pipeline {
 
     stage('Monitoring (New Relic Deployment Marker)') {
       when {
-        anyOf {
-          branch 'main'
-          tag '*'
-        }
+        expression { params.RUN_MONITORING || params.RUN_PROD_DEPLOY || env.BRANCH_NAME == 'main' || env.TAG_NAME }
       }
       steps {
         sh '''
