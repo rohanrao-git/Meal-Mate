@@ -8,16 +8,12 @@ pipeline {
 
   environment {
     APP_NAME = 'meal-mate'
-
     IMAGE_REPO = 'meal-mate'
     IMAGE_TAG = "${env.BUILD_NUMBER}"
-    IMAGE_URI = "${IMAGE_REPO}:${IMAGE_TAG}"
-
-    PROD_TAG = 'prod'
-
-    STAGING_PORT = '18080'
+    IMAGE_URI = "${env.IMAGE_REPO}:${env.IMAGE_TAG}"
+    PROD_IMAGE_TAG = 'prod'
     PROD_PORT = '8081'
-
+    STAGING_PORT = '18080'
     REPORT_DIR = 'reports'
   }
 
@@ -41,7 +37,7 @@ pipeline {
     stage('Test') {
       steps {
         sh 'mkdir -p $REPORT_DIR'
-        sh 'npx vitest run --reporter=default --reporter=junit --outputFile=$REPORT_DIR/junit.xml --coverage.enabled=true --coverage.reporter=lcov --coverage.reporter=text'
+        sh 'npx vitest run --reporter=default --reporter=junit --outputFile=$REPORT_DIR/junit.xml --coverage.enabled=true --coverage.reporter=lcov'
       }
       post {
         always {
@@ -81,7 +77,7 @@ pipeline {
       }
     }
 
-    stage('Deploy Staging') {
+    stage('Deploy to Staging') {
       steps {
         sh 'docker compose -f ci/docker-compose.staging.yml down --remove-orphans || true'
         sh 'IMAGE_REPO=$IMAGE_REPO IMAGE_TAG=$IMAGE_TAG docker compose -f ci/docker-compose.staging.yml up -d'
@@ -89,36 +85,58 @@ pipeline {
       }
     }
 
-    stage('Release (Production Approval)') {
+    stage('Approve Production Deployment') {
+      when {
+        anyOf {
+          branch 'main'
+          tag '*'
+        }
+      }
       steps {
-        script {
-          input message: "Deploy BUILD #${env.BUILD_NUMBER} to PRODUCTION?", ok: "Deploy"
-
-          sh """
-            docker tag ${IMAGE_URI} ${IMAGE_REPO}:${PROD_TAG}
-
-            IMAGE_REPO=${IMAGE_REPO} IMAGE_TAG=${PROD_TAG} PROD_PORT=${PROD_PORT} \
-              docker compose -f ci/docker-compose.prod.yml down --remove-orphans || true
-
-            IMAGE_REPO=${IMAGE_REPO} IMAGE_TAG=${PROD_TAG} PROD_PORT=${PROD_PORT} \
-              docker compose -f ci/docker-compose.prod.yml up -d
-
-            curl -fsS http://localhost:${PROD_PORT}/health
-          """
+        timeout(time: 15, unit: 'MINUTES') {
+          input message: "🚀 Promote STAGING build #${env.BUILD_NUMBER} to PRODUCTION?", ok: 'Deploy to Prod'
         }
       }
     }
 
-    stage('Monitoring') {
+    stage('Deploy to Production') {
+      when {
+        anyOf {
+          branch 'main'
+          tag '*'
+        }
+      }
+      steps {
+        sh '''
+          docker tag "$IMAGE_URI" "$IMAGE_REPO:$PROD_IMAGE_TAG"
+
+          IMAGE_REPO="$IMAGE_REPO" IMAGE_TAG="$PROD_IMAGE_TAG" PROD_PORT="$PROD_PORT" \
+            docker compose -f ci/docker-compose.prod.yml down --remove-orphans || true
+
+          IMAGE_REPO="$IMAGE_REPO" IMAGE_TAG="$PROD_IMAGE_TAG" PROD_PORT="$PROD_PORT" \
+            docker compose -f ci/docker-compose.prod.yml up -d
+
+          curl -fsS "http://localhost:$PROD_PORT/health"
+        '''
+      }
+    }
+
+    stage('Monitoring (New Relic Deployment Marker)') {
+      when {
+        anyOf {
+          branch 'main'
+          tag '*'
+        }
+      }
       steps {
         sh '''
           if [ -n "$NEW_RELIC_API_KEY" ] && [ -n "$NEW_RELIC_ACCOUNT_ID" ]; then
             curl -sS -X POST "https://api.newrelic.com/graphql" \
               -H "Content-Type: application/json" \
               -H "API-Key: $NEW_RELIC_API_KEY" \
-              -d "{\"query\":\"mutation { changeTrackingCreateDeployment(deployment: { version: \\\"$IMAGE_TAG\\\", user: \\\"jenkins\\\", description: \\\"Release $IMAGE_URI deployed to production\\\", entityGuid: \\\"$NEW_RELIC_ENTITY_GUID\\\" }) { deploymentId } }\"}"
+              -d "{\"query\":\"mutation { changeTrackingCreateDeployment(deployment: { version: \\\"$IMAGE_TAG\\\", user: \\\"jenkins\\\", description: \\\"$IMAGE_URI deployed to production\\\", entityGuid: \\\"$NEW_RELIC_ENTITY_GUID\\\" }) { deploymentId } }\"}"
           else
-            echo "New Relic not configured, skipping."
+            echo "Skipping New Relic deployment marker (missing credentials)"
           fi
         '''
       }
@@ -130,7 +148,7 @@ pipeline {
       cleanWs()
     }
     failure {
-      echo "Pipeline failed. Check logs in Jenkins."
+      echo 'Pipeline failed. Check logs, tests, quality, or security stages.'
     }
   }
 }
