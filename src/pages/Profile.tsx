@@ -19,7 +19,7 @@ const Profile = () => {
           R
         </div>
         <div className="flex-1">
-          <h1 className="text-xl font-bold">Rohan Rao</h1>
+          <h1 className="text-xl font-bold">Rohan</h1>
           <p className="text-xs text-muted-foreground">Student · Melbourne</p>
         </div>
         <button className="w-10 h-10 rounded-full bg-card grid place-items-center shadow-[var(--shadow-soft)]">
