@@ -12,6 +12,7 @@ pipeline {
     IMAGE_TAG = "${env.BUILD_NUMBER}"
     IMAGE_URI = "${env.IMAGE_REPO}:${env.IMAGE_TAG}"
     REPORT_DIR = 'reports'
+    STAGING_PORT = '18080'
   }
 
   stages {
@@ -72,8 +73,9 @@ pipeline {
 
     stage('Deploy') {
       steps {
+        sh 'docker compose -f ci/docker-compose.staging.yml down --remove-orphans || true'
         sh 'IMAGE_REPO=$IMAGE_REPO IMAGE_TAG=$IMAGE_TAG docker compose -f ci/docker-compose.staging.yml up -d'
-        sh 'curl -fsS http://localhost:8080/health'
+        sh 'curl -fsS http://localhost:$STAGING_PORT/health'
       }
     }
 

@@ -3,5 +3,5 @@ services:
     image: ${IMAGE_REPO}:${IMAGE_TAG}
     container_name: meal-mate-staging
     ports:
-      - "8080:80"
+      - "${STAGING_PORT:-18080}:80"
     restart: unless-stopped
