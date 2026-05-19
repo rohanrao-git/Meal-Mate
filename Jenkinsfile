@@ -20,6 +20,7 @@ pipeline {
     PROD_PORT = '8081'
     STAGING_PORT = '18080'
     REPORT_DIR = 'reports'
+    DEPLOY_TO_PROD = 'false'
   }
 
   stages {
@@ -90,20 +91,44 @@ pipeline {
       }
     }
 
-    stage('Approve Production Deployment') {
+    stage('Production Deployment Decision') {
       when {
-        expression { params.RUN_PROD_DEPLOY || env.BRANCH_NAME == 'main' || env.TAG_NAME }
+        expression {
+          params.RUN_PROD_DEPLOY ||
+          env.TAG_NAME ||
+          env.BRANCH_NAME == 'main' ||
+          env.GIT_BRANCH == 'origin/main' ||
+          env.GIT_BRANCH == 'main'
+        }
       }
       steps {
-        timeout(time: 15, unit: 'MINUTES') {
-          input message: "🚀 Promote STAGING build #${env.BUILD_NUMBER} to PRODUCTION?", ok: 'Deploy to Prod'
+        script {
+          if (params.RUN_PROD_DEPLOY) {
+            env.DEPLOY_TO_PROD = 'true'
+          } else {
+            timeout(time: 15, unit: 'MINUTES') {
+              def decision = input(
+                message: "🚀 Promote STAGING build #${env.BUILD_NUMBER} to PRODUCTION?",
+                ok: 'Continue',
+                parameters: [
+                  choice(
+                    name: 'DEPLOY_TO_PROD',
+                    choices: ['No', 'Yes'],
+                    description: 'Choose Yes to deploy this build to production.'
+                  )
+                ]
+              )
+              env.DEPLOY_TO_PROD = decision == 'Yes' ? 'true' : 'false'
+            }
+          }
+          echo "DEPLOY_TO_PROD=${env.DEPLOY_TO_PROD}"
         }
       }
     }
 
     stage('Deploy to Production') {
       when {
-        expression { params.RUN_PROD_DEPLOY || env.BRANCH_NAME == 'main' || env.TAG_NAME }
+        expression { env.DEPLOY_TO_PROD == 'true' }
       }
       steps {
         sh '''
@@ -122,7 +147,7 @@ pipeline {
 
     stage('Monitoring (New Relic Deployment Marker)') {
       when {
-        expression { params.RUN_MONITORING || params.RUN_PROD_DEPLOY || env.BRANCH_NAME == 'main' || env.TAG_NAME }
+        expression { params.RUN_MONITORING || env.DEPLOY_TO_PROD == 'true' }
       }
       steps {
         sh '''
