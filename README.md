@@ -107,3 +107,11 @@ VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 ```
 
 4. Run app and use Inventory page to perform CRUD operations.
+
+
+
+RUN SONARQUBE
+
+docker run -d --name sonarqube \
+  -p 9000:9000 \
+  sonarqube:community
