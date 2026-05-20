@@ -20,7 +20,6 @@ pipeline {
     PROD_PORT = '8081'
     STAGING_PORT = '18080'
     REPORT_DIR = 'reports'
-    DEPLOY_TO_PROD = 'false'
   }
 
   stages {
@@ -95,9 +94,10 @@ pipeline {
     stage('Production Deployment Decision') {
       steps {
         script {
-          def deployToProd = params.RUN_PROD_DEPLOY
+          env.DEPLOY_TO_PROD = 'false'
 
-          if (deployToProd) {
+          if (params.RUN_PROD_DEPLOY) {
+            env.DEPLOY_TO_PROD = 'true'
             echo 'RUN_PROD_DEPLOY=true -> production deployment enabled.'
           } else {
             try {
@@ -107,15 +107,14 @@ pipeline {
                   ok: 'Deploy to Production',
                   submitterParameter: 'APPROVED_BY'
                 )
-                deployToProd = true
+                env.DEPLOY_TO_PROD = 'true'
                 echo "Production approval granted by: ${approvedBy}"
               }
             } catch (err) {
-              deployToProd = false
+              env.DEPLOY_TO_PROD = 'false'
               echo "Production approval not granted: ${err.getClass().getName()} - ${err.getMessage()}"
             }
           }
-          env.DEPLOY_TO_PROD = deployToProd ? 'true' : 'false'
           echo "DEPLOY_TO_PROD=${env.DEPLOY_TO_PROD}"
         }
       }
