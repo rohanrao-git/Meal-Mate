@@ -107,19 +107,17 @@ pipeline {
           if (params.RUN_PROD_DEPLOY) {
             env.DEPLOY_TO_PROD = 'true'
           } else {
-            timeout(time: 15, unit: 'MINUTES') {
-              def decision = input(
-                message: "🚀 Promote STAGING build #${env.BUILD_NUMBER} to PRODUCTION?",
-                ok: 'Continue',
-                parameters: [
-                  choice(
-                    name: 'DEPLOY_TO_PROD',
-                    choices: ['No', 'Yes'],
-                    description: 'Choose Yes to deploy this build to production.'
-                  )
-                ]
-              )
-              env.DEPLOY_TO_PROD = decision == 'Yes' ? 'true' : 'false'
+            try {
+              timeout(time: 15, unit: 'MINUTES') {
+                input(
+                  message: "Promote STAGING build #${env.BUILD_NUMBER} to PRODUCTION?",
+                  ok: 'Deploy to Production'
+                )
+                env.DEPLOY_TO_PROD = 'true'
+              }
+            } catch (err) {
+              // Aborted, timed out, or dismissed: keep prod deployment disabled.
+              env.DEPLOY_TO_PROD = 'false'
             }
           }
           echo "DEPLOY_TO_PROD=${env.DEPLOY_TO_PROD}"
