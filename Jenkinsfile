@@ -91,52 +91,56 @@ pipeline {
       }
     }
 
-    stage('Production Deployment Decision') {
-      steps {
-        script {
-          env.DEPLOY_TO_PROD = 'false'
-
-          if (params.RUN_PROD_DEPLOY) {
-            env.DEPLOY_TO_PROD = 'true'
-            echo 'RUN_PROD_DEPLOY=true -> production deployment enabled.'
-          } else {
-            try {
-              timeout(time: 15, unit: 'MINUTES') {
-                def approvedBy = input(
-                  message: "Promote STAGING build #${env.BUILD_NUMBER} to PRODUCTION?",
-                  ok: 'Deploy to Production',
-                  submitterParameter: 'APPROVED_BY'
-                )
-                env.DEPLOY_TO_PROD = 'true'
-                echo "Production approval granted by: ${approvedBy}"
-              }
-            } catch (err) {
+    stage('Release') {
+      stages {
+        stage('Production Deployment Decision') {
+          steps {
+            script {
               env.DEPLOY_TO_PROD = 'false'
-              echo "Production approval not granted: ${err.getClass().getName()} - ${err.getMessage()}"
+
+              if (params.RUN_PROD_DEPLOY) {
+                env.DEPLOY_TO_PROD = 'true'
+                echo 'RUN_PROD_DEPLOY=true -> production deployment enabled.'
+              } else {
+                try {
+                  timeout(time: 15, unit: 'MINUTES') {
+                    def approvedBy = input(
+                      message: "Promote STAGING build #${env.BUILD_NUMBER} to PRODUCTION?",
+                      ok: 'Deploy to Production',
+                      submitterParameter: 'APPROVED_BY'
+                    )
+                    env.DEPLOY_TO_PROD = 'true'
+                    echo "Production approval granted by: ${approvedBy}"
+                  }
+                } catch (err) {
+                  env.DEPLOY_TO_PROD = 'false'
+                  echo "Production approval not granted: ${err.getClass().getName()} - ${err.getMessage()}"
+                }
+              }
+              echo "DEPLOY_TO_PROD=${env.DEPLOY_TO_PROD}"
             }
           }
-          echo "DEPLOY_TO_PROD=${env.DEPLOY_TO_PROD}"
         }
-      }
-    }
 
-    stage('Deploy to Production') {
-      when {
-        expression { env.DEPLOY_TO_PROD == 'true' }
-      }
-      steps {
-        sh '''
-          docker rm -f meal-mate-production >/dev/null 2>&1 || true
-          docker tag "$IMAGE_URI" "$IMAGE_REPO:$PROD_IMAGE_TAG"
+        stage('Deploy to Production') {
+          when {
+            expression { env.DEPLOY_TO_PROD == 'true' }
+          }
+          steps {
+            sh '''
+              docker rm -f meal-mate-production >/dev/null 2>&1 || true
+              docker tag "$IMAGE_URI" "$IMAGE_REPO:$PROD_IMAGE_TAG"
 
-          IMAGE_REPO="$IMAGE_REPO" IMAGE_TAG="$PROD_IMAGE_TAG" PROD_PORT="$PROD_PORT" \
-            docker compose -p meal-mate-prod -f ci/docker-compose.prod.yml down --remove-orphans || true
+              IMAGE_REPO="$IMAGE_REPO" IMAGE_TAG="$PROD_IMAGE_TAG" PROD_PORT="$PROD_PORT" \
+                docker compose -p meal-mate-prod -f ci/docker-compose.prod.yml down --remove-orphans || true
 
-          IMAGE_REPO="$IMAGE_REPO" IMAGE_TAG="$PROD_IMAGE_TAG" PROD_PORT="$PROD_PORT" \
-            docker compose -p meal-mate-prod -f ci/docker-compose.prod.yml up -d
+              IMAGE_REPO="$IMAGE_REPO" IMAGE_TAG="$PROD_IMAGE_TAG" PROD_PORT="$PROD_PORT" \
+                docker compose -p meal-mate-prod -f ci/docker-compose.prod.yml up -d
 
-          curl -fsS "http://localhost:$PROD_PORT/health"
-        '''
+              curl -fsS "http://localhost:$PROD_PORT/health"
+            '''
+          }
+        }
       }
     }
 
