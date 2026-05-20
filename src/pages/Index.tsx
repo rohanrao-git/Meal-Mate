@@ -30,7 +30,7 @@ const Index = () => {
       <section className="px-5 pt-6">
         <p className="label-mono text-muted-foreground">Today's brief</p>
         <h2 className="text-[28px] leading-tight font-bold mt-1.5">
-          Hey Rohan Beta — <span className="italic text-accent">cook now before you shop.</span>
+          Hey Rohan Beta — <span className="italic text-accent">cook now before you shop (v2).</span>
         </h2>
       </section>
 

@@ -117,6 +117,7 @@ pipeline {
               }
             } catch (err) {
               // Aborted, timed out, or dismissed: keep prod deployment disabled.
+              echo "Production approval not granted: ${err.getClass().getName()} - ${err.getMessage()}"
               env.DEPLOY_TO_PROD = 'false'
             }
           }
