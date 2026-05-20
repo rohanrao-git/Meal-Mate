@@ -93,33 +93,13 @@ pipeline {
     }
 
     stage('Production Deployment Decision') {
-      when {
-        expression {
-          params.RUN_PROD_DEPLOY ||
-          env.TAG_NAME ||
-          env.BRANCH_NAME == 'main' ||
-          env.GIT_BRANCH == 'origin/main' ||
-          env.GIT_BRANCH == 'main'
-        }
-      }
       steps {
         script {
-          if (params.RUN_PROD_DEPLOY) {
-            env.DEPLOY_TO_PROD = 'true'
+          env.DEPLOY_TO_PROD = params.RUN_PROD_DEPLOY ? 'true' : 'false'
+          if (env.DEPLOY_TO_PROD == 'true') {
+            echo 'RUN_PROD_DEPLOY=true -> production deployment enabled.'
           } else {
-            try {
-              timeout(time: 15, unit: 'MINUTES') {
-                input(
-                  message: "Promote STAGING build #${env.BUILD_NUMBER} to PRODUCTION?",
-                  ok: 'Deploy to Production'
-                )
-                env.DEPLOY_TO_PROD = 'true'
-              }
-            } catch (err) {
-              // Aborted, timed out, or dismissed: keep prod deployment disabled.
-              echo "Production approval not granted: ${err.getClass().getName()} - ${err.getMessage()}"
-              env.DEPLOY_TO_PROD = 'false'
-            }
+            echo 'RUN_PROD_DEPLOY=false -> staging only (production deployment skipped).'
           }
           echo "DEPLOY_TO_PROD=${env.DEPLOY_TO_PROD}"
         }
