@@ -146,13 +146,17 @@ pipeline {
       }
       steps {
         sh '''
-          if [ -n "$NEW_RELIC_API_KEY" ] && [ -n "$NEW_RELIC_ACCOUNT_ID" ]; then
+          if [ -n "$NEW_RELIC_API_KEY" ] && [ -n "$NEW_RELIC_ENTITY_GUID" ]; then
+            cat > reports/newrelic-deployment-marker.json <<EOF
+{"query":"mutation { changeTrackingCreateDeployment(deployment: { version: \\"$IMAGE_TAG\\", user: \\"jenkins\\", description: \\"$IMAGE_URI deployed to production\\", entityGuid: \\"$NEW_RELIC_ENTITY_GUID\\" }) { deploymentId } }"}
+EOF
+
             curl -sS -X POST "https://api.newrelic.com/graphql" \
               -H "Content-Type: application/json" \
               -H "API-Key: $NEW_RELIC_API_KEY" \
-              -d "{\"query\":\"mutation { changeTrackingCreateDeployment(deployment: { version: \\\"$IMAGE_TAG\\\", user: \\\"jenkins\\\", description: \\\"$IMAGE_URI deployed to production\\\", entityGuid: \\\"$NEW_RELIC_ENTITY_GUID\\\" }) { deploymentId } }\"}"
+              --data @reports/newrelic-deployment-marker.json
           else
-            echo "Skipping New Relic deployment marker (missing credentials)"
+            echo "Skipping New Relic deployment marker (missing NEW_RELIC_API_KEY or NEW_RELIC_ENTITY_GUID)"
           fi
         '''
       }
