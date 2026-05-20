@@ -95,8 +95,9 @@ pipeline {
     stage('Production Deployment Decision') {
       steps {
         script {
-          if (params.RUN_PROD_DEPLOY) {
-            env.DEPLOY_TO_PROD = 'true'
+          def deployToProd = params.RUN_PROD_DEPLOY
+
+          if (deployToProd) {
             echo 'RUN_PROD_DEPLOY=true -> production deployment enabled.'
           } else {
             try {
@@ -106,14 +107,15 @@ pipeline {
                   ok: 'Deploy to Production',
                   submitterParameter: 'APPROVED_BY'
                 )
-                env.DEPLOY_TO_PROD = 'true'
+                deployToProd = true
                 echo "Production approval granted by: ${approvedBy}"
               }
             } catch (err) {
-              env.DEPLOY_TO_PROD = 'false'
+              deployToProd = false
               echo "Production approval not granted: ${err.getClass().getName()} - ${err.getMessage()}"
             }
           }
+          env.DEPLOY_TO_PROD = deployToProd ? 'true' : 'false'
           echo "DEPLOY_TO_PROD=${env.DEPLOY_TO_PROD}"
         }
       }
