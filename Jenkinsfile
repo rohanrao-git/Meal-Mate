@@ -95,11 +95,24 @@ pipeline {
     stage('Production Deployment Decision') {
       steps {
         script {
-          env.DEPLOY_TO_PROD = params.RUN_PROD_DEPLOY ? 'true' : 'false'
-          if (env.DEPLOY_TO_PROD == 'true') {
+          if (params.RUN_PROD_DEPLOY) {
+            env.DEPLOY_TO_PROD = 'true'
             echo 'RUN_PROD_DEPLOY=true -> production deployment enabled.'
           } else {
-            echo 'RUN_PROD_DEPLOY=false -> staging only (production deployment skipped).'
+            try {
+              timeout(time: 15, unit: 'MINUTES') {
+                def approvedBy = input(
+                  message: "Promote STAGING build #${env.BUILD_NUMBER} to PRODUCTION?",
+                  ok: 'Deploy to Production',
+                  submitterParameter: 'APPROVED_BY'
+                )
+                env.DEPLOY_TO_PROD = 'true'
+                echo "Production approval granted by: ${approvedBy}"
+              }
+            } catch (err) {
+              env.DEPLOY_TO_PROD = 'false'
+              echo "Production approval not granted: ${err.getClass().getName()} - ${err.getMessage()}"
+            }
           }
           echo "DEPLOY_TO_PROD=${env.DEPLOY_TO_PROD}"
         }
