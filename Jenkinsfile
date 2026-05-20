@@ -85,6 +85,7 @@ pipeline {
 
     stage('Deploy to Staging') {
       steps {
+        sh 'docker rm -f meal-mate-staging >/dev/null 2>&1 || true'
         sh 'docker compose -p meal-mate-staging -f ci/docker-compose.staging.yml down --remove-orphans || true'
         sh 'IMAGE_REPO=$IMAGE_REPO IMAGE_TAG=$IMAGE_TAG docker compose -p meal-mate-staging -f ci/docker-compose.staging.yml up -d'
         sh 'curl -fsS http://localhost:$STAGING_PORT/health'
@@ -132,6 +133,7 @@ pipeline {
       }
       steps {
         sh '''
+          docker rm -f meal-mate-production >/dev/null 2>&1 || true
           docker tag "$IMAGE_URI" "$IMAGE_REPO:$PROD_IMAGE_TAG"
 
           IMAGE_REPO="$IMAGE_REPO" IMAGE_TAG="$PROD_IMAGE_TAG" PROD_PORT="$PROD_PORT" \
