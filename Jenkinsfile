@@ -147,6 +147,7 @@ pipeline {
       steps {
         sh '''
           if [ -n "$NEW_RELIC_API_KEY" ] && [ -n "$NEW_RELIC_ENTITY_GUID" ]; then
+            mkdir -p reports
             cat > reports/newrelic-deployment-marker.json <<EOF
 {"query":"mutation { changeTrackingCreateDeployment(deployment: { version: \\"$IMAGE_TAG\\", user: \\"jenkins\\", description: \\"$IMAGE_URI deployed to production\\", entityGuid: \\"$NEW_RELIC_ENTITY_GUID\\" }) { deploymentId } }"}
 EOF
